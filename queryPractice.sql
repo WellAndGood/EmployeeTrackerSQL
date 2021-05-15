@@ -30,6 +30,17 @@ INNER JOIN role r ON e.role_id = r.id
 INNER JOIN department d ON d.id = r.department_id
 WHERE r.title = "Sales Lead" OR r.title = "Lead Engineer" OR r.title = "Account Manager" OR r.title = "Legal Team Lead";
 
+SELECT CONCAT(e.first_name, ' ', e.last_name) AS 'full_name', d.name, r.title
+                FROM employee e
+                INNER JOIN role r ON e.role_id = r.id
+                INNER JOIN department d ON d.id = r.department_id
+                WHERE manager_id = 1;
+
+
+SELECT first_name, last_name, manager_id 
+                FROM employee
+                WHERE manager_id = 7;
+
 
 -- Function #4 - Add Employee
 SELECT manager_id FROM employee;
@@ -43,7 +54,6 @@ SELECT manager_id FROM employee;
 -- Q4) What is the employee's manager? List of managers (with NULLs removed)
 -- inquirer: empManager
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(firstName, lastName, empRole, empManager);
-
 
 -- Function #5 - Remove employee
 -- Need to update based on full name, or ID based on CONCAT first and last name

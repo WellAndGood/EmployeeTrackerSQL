@@ -26,10 +26,11 @@ CREATE TABLE employee (
     PRIMARY KEY (id)
 );
 
-INSERT INTO department (id, name) VALUES (100, "Sales");
-INSERT INTO department (id, name) VALUES (200, "Finance");
-INSERT INTO department (id, name) VALUES (300, "Legal");
-INSERT INTO department (id, name) VALUES (400, "Engineering");
+INSERT INTO department (id, name) VALUES 
+(100, "Sales"),
+(200, "Engineering"),
+(300, "Finance"),
+(400, "Legal");
 
 SELECT * FROM department;
 
@@ -48,15 +49,14 @@ SELECT * FROM role;
 SELECT id FROM role WHERE title = "Lawyer";
 SELECT id, title, salary FROM role WHERE department_id = 200;
 
-INSERT INTO employee (first_name, last_name, role_id) VALUES
-("Harry", "Rosen", 101);
-INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES("Severus", "Snape", 102, 1);
-INSERT INTO employee (first_name, last_name, role_id) VALUES("Daniel", "Pisani", 202);
-INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES("Joe", "Blow", 201, 3);
-INSERT INTO employee (first_name, last_name, role_id) VALUES("Katie", "Ladlow", 301);
-INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES("Tipper", "Kaldwell", 302, 5);
-INSERT INTO employee (first_name, last_name, role_id) VALUES("Carmela", "Dabesti", 401);
-INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES("Ripper", "Chunks", 402, 7);
-
+INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES
+("Harry", "Rosen", 101, NULL),
+("Severus", "Snape", 102, 1),
+("Joe", "Blow", 201, NULL),
+("Daniel", "Pisani", 202, 3),
+("Katie", "Ladlow", 301, NULL),
+("Tipper", "Kaldwell", 302, 5),
+("Carmela", "Dabesti", 401, NULL),
+("Ripper", "Chunks", 402, 7);
 
 SELECT * FROM employee;
