@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/WellAndGood/EmployeeTrackerSQL#readme",
   "dependencies": {
+    "dotenv": "^9.0.2",
     "inquirer": "^8.0.0",
     "mysql": "^2.18.1"
   }

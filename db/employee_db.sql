@@ -3,12 +3,14 @@ CREATE DATABASE workplace_db;
 
 USE workplace_db;
 
+-- Creates department
 CREATE TABLE department (
 	id INTEGER,
     name VARCHAR(30),
     PRIMARY KEY (id)
 );
 
+-- Creates role table
 CREATE TABLE role (
 	id INTEGER,
     department_id INTEGER,
@@ -17,6 +19,7 @@ CREATE TABLE role (
     PRIMARY KEY (id)
 );
 
+-- Creates employee table
 CREATE TABLE employee (
 	id INTEGER(11) AUTO_INCREMENT,
     first_name VARCHAR(30) NOT NULL,

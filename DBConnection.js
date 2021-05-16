@@ -1,24 +1,37 @@
 const mysql = require('mysql');
-// const connection = require(./config/connection.js) //env file
+const connection = require('./config/connection.js') //env file
 const inquirer = require('inquirer')
-// require(console.table)
 
-//require('dotenv').config()
-const connection = mysql.createConnection({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'Appl35&Orang35',
-    database: 'workplace_db'
-}); //turn this into a separate file
-// module.exports = connection
+connection.connect(function(err) {
+    if (err) throw err;
+    console.log(`Connected as id ${connection.threadId}`);
+    initProgram()
+});
 
-// connection.connect(function(err) {
-//     if (err) throw err;
-//     initProgram()
-// });
-
-initProgram()
+console.log(
+`
+.#######.##.....#.########.##.......#######.##....#.#######.########
+.##......###...##.##.....#.##......##.....#..##..##.##......##......
+.##......####.###.##.....#.##......##.....#...####..##......##......
+.######..##.###.#.########.##......##.....#....##...######..######..
+.##......##.....#.##.......##......##.....#....##...##......##......
+.##......##.....#.##.......##......##.....#....##...##......##......
+.#######.##.....#.##.......#######..#######....##...#######.########`
+)
+console.log(
+`                           
+.#######.########....###....######.##....#.#######.########.
+....##...##.....#...##.##..##....#.##...##.##......##.....##
+....##...##.....#..##...##.##......##..##..##......##.....##
+....##...########.##.....#.##......#####...######..########.
+....##...##...##..########.##......##..##..##......##...##..
+....##...##....##.##.....#.##....#.##...##.##......##....##.
+....##...##.....#.##.....#..######.##....#.#######.##.....##`
+)
+console.log("------------------------------------------------------------")
+console.log("------------------------------------------------------------")
+console.log("")
+console.log("")
 
 function initProgram() {
     inquirer.prompt({
@@ -60,11 +73,11 @@ function initProgram() {
                 break;
             case '7) Update Employee Manager':
                 console.log("update employee manager")
-                // updateManager()
+                updateManager()
                 break;
             case '8) View budgets by department':
                 console.log('view budgets')
-                // viewBudgets();
+                viewBudgets();
                 break;
             default:
                 break;
@@ -72,19 +85,9 @@ function initProgram() {
     })
 }
 
-const findAllEmployees = () => {
-    console.log('Finding all employees...\n');
-     connection.query(
-        `SELECT id, CONCAT(employee.first_name, ' ', employee.last_name) AS 'full_name' FROM employee;`,
-        function(err, res){
-            console.table(res)
-        }
-    )
-}
-
 // Function #1 - Show Employees ✔️
 const showEmployees = () => {
-    console.log('Finding all employees...\n');
+    console.log('Generating a list of all employees...\n');
     connection.query(
         `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS 'department', r.salary, e.manager_id
         FROM employee e
@@ -96,8 +99,21 @@ const showEmployees = () => {
             initProgram()
         }
     )
-    
 }
+
+// const showEmployeesInner = () => {
+//     console.log('Generating a list of all employees...\n');
+//     connection.query(
+//         `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS 'department', r.salary, e.manager_id
+//         FROM employee e
+//         INNER JOIN role r ON e.role_id = r.id
+//         INNER JOIN department d ON d.id = r.department_id;`,
+//         function(err, res){
+//             // console.log(res)
+//             console.table(res)
+//         }
+//     )
+// }
 
 // Function #2 - View All Employees By Department ✔️, but need to readjust list based on QUERY
 const viewAllByDepartment = () => {
@@ -108,7 +124,7 @@ const viewAllByDepartment = () => {
         message: 'Which department would you like to view?',
         choices: ['Sales', 'Legal', 'Finance', 'Engineering']
     }).then((data) => {
-    console.log('Finding all employees...\n');
+    console.log(`Finding all employees in ${data.whichDepartment}...\n`);
     connection.query(
         `SELECT CONCAT(e.first_name, ' ', e.last_name) AS 'full_name', d.name, r.title, r.salary
         FROM employee e
@@ -117,9 +133,10 @@ const viewAllByDepartment = () => {
         WHERE d.name = "${data.whichDepartment}";`,
         function(err, res){
             console.table(res);
+            initProgram()
         }
     )}
-    )};
+)};
 
 // Function #3 - View All Employees By Manager  ✔️ need to double check specifics
 const viewByManager = () => {
@@ -155,7 +172,7 @@ const viewByManager = () => {
         ]).then((response) => {
             // This inserts the manager's name string into the key:value dictionary of managersID
             let managersIDToUse = parseInt(managersID[response.listOfManagers]);
-            console.log(managersIDToUse)
+            // console.log(managersIDToUse)
 
             // is querying an empty table
             connection.query(
@@ -165,13 +182,14 @@ const viewByManager = () => {
                 [ managersIDToUse ]
                 ,
                 function(err, manager){
-                    console.table(manager) // returns a blank table (not desired)
+                    console.table(manager)
+                    initProgram()
                 });
         })
     })
 }
 
-// Function #4 - Add Employee
+// Function #4 - Add Employee ✔️
 const addEmployee = () => {
     inquirer
     .prompt([
@@ -234,7 +252,7 @@ const addEmployee = () => {
                                 choices: managersNames // Does not work.
                             }
                         ]).then((answer) => {
-                            console.log(answer.manager)
+                            // console.log(answer.manager)
 
                             // Returns the manager's ID based on their full name
                             managersID = ""
@@ -256,7 +274,7 @@ const addEmployee = () => {
                             employeeMap.push(managersID)
                             
                             connection.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, employeeMap, (err, res) => {
-                                console.log(employeeMap);
+                                // console.log(employeeMap);
                                 if (err) throw err;
                                 showEmployees()
                             })
@@ -268,7 +286,7 @@ const addEmployee = () => {
     })
 }
 
-// Function #5 - Remove Employee
+// Function #5 - Remove Employee ✔️
 const deleteEmployee = () =>  {
     connection.query(`SELECT * FROM employee`, (err, res) => {
         if (err) throw err;
@@ -284,8 +302,8 @@ const deleteEmployee = () =>  {
         addEmployeesToList()
 
         // `employeeNames` prints, but does not appear on the inquirer
-        console.log(employeesToChoose)
-        console.log(employeeNames) 
+        // console.log(employeesToChoose)
+        // console.log(employeeNames) 
 
         inquirer.prompt([
             {
@@ -342,8 +360,7 @@ const deleteEmployee = () =>  {
     })
 }
 
-// Function #6 - Update Employee Role
-
+// Function #6 - Update Employee Role ✔️
 const updateEmployee = () => {
     console.log('Updating an employee...\n');
 
@@ -393,7 +410,9 @@ const updateEmployee = () => {
                         let employeeID = ""
                             function findID(name) {
                                 employeeToChange.forEach((element) => {
-                                    console.log(element.name, name, element.id)
+                                    
+                                    // console.log(element.name, name, element.id)
+                                    
                                     if (element.name === name) {
                                         employeeID = parseInt(element.id)
                                         queryArray.push(employeeID)
@@ -402,14 +421,16 @@ const updateEmployee = () => {
                                 })
                             }
                         findID(answer.chooseName)
-                        console.log("employeesID = " + employeeID)
+                        // console.log("employeesID = " + employeeID)
 
                         let roleCode = ""
 
                         function findroleID(role) {
-                            console.log(role)
+                            // console.log(role)
                             rolesMap.forEach((element) => {
-                                console.log(element)
+                                
+                                // console.log(element)
+                                
                                 if (element.title === role) {
                                     roleCode = parseInt(element.role_code)
                                     queryArray.unshift(roleCode)
@@ -418,27 +439,135 @@ const updateEmployee = () => {
                             })
                         }
                         findroleID(answer.newRole)
-                        console.log(queryArray)
+                        // console.log(queryArray)
 
                         connection.query(
                         `UPDATE employee
                         SET role_id = ?
                         WHERE id = ?;`, queryArray,
                         function(err, res) {
-                            console.log(`${answer.chooseName} updated to !`)
-                            console.log(res)
+                            console.log(`${answer.chooseName} updated to ${answer.newRole}!`)
+                            // console.log(res)
                             showEmployees()
-                            initProgram()
-                            }
-                        )  
-                    })             
+                        }
+                    )  
+                })             
             })
         }
     )
-    console.log(employeeToChange)
 };
 
-connection.connect((err) => {
-    if (err) throw err;
-    console.log(`connected as id ${connection.threadId}`);
-});
+// Function #7 - Update Employee's Manager ✔️
+const updateManager = () => {
+    connection.query(
+        `SELECT e.id AS 'id', e.first_name, e.last_name, r.title, r.id AS 'role_id', d.name AS 'department', r.salary, e.manager_id
+        FROM employee e
+        INNER JOIN role r ON e.role_id = r.id
+        INNER JOIN department d ON d.id = r.department_id;`,
+        function(err, res) {
+            let employeeToChange = {}
+            let employeeList = []
+            
+            // console.log(res)
+            // console.table(res)
+
+            // Maps employees into an employee Object array (full name + id) and array (full name)
+            employeeToChange = res.map(({ id, first_name, last_name }) => ({ name: first_name + ' ' + last_name, id: id }));
+            employeeList = res.map(({first_name, last_name}) => (`${first_name} ${last_name}`));
+            
+            // Maps employees into a management Object array (full name + id) and array (full name)
+            managerToAssign = res.map(({ id, first_name, last_name }) => ({ name: first_name + ' ' + last_name, id: id }));
+            managerList = res.map(({first_name, last_name}) => (`${first_name} ${last_name}`));
+
+            // console.log(employeeToChange)
+            // console.log(employeeList)
+            // console.log(managerToAssign)
+            // console.log(managerList)
+
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'chooseName',
+                    message: `Select the employee you'd like to change`,
+                    choices: employeeList
+                },
+                {
+                    type: 'list',
+                    name: 'newManager',
+                    message: `To what manager would you like to assign this employee?`,
+                    choices: managerList
+                }
+            ]).then((answer) => {
+                let queryArray = []
+                let employeeID = ""
+                    function findID(name) {
+                        employeeToChange.forEach((element) => {
+                            // console.log(element.name, name, element.id)
+                            if (element.name === name) {
+                                employeeID = parseInt(element.id)
+                                queryArray.push(employeeID)
+                                return employeeID
+                            }
+                        })
+                    }
+
+                findID(answer.chooseName)
+                // console.log("employeesID = " + employeeID)
+
+                let managementID = ""
+                    function findManagementID(name) {
+                        managerToAssign.forEach((element) => {
+                            
+                            // console.log(element.name, name, element.id)
+                            
+                            if (element.name === name) {
+                                managementID = parseInt(element.id)
+                                queryArray.unshift(managementID)
+                                return managementID
+                            }
+                        })
+                    }
+
+                findManagementID(answer.newManager)
+                // console.log("managementID = " + managementID)
+                // console.log(queryArray)
+
+                connection.query(
+                    `UPDATE employee
+                    SET manager_id = ?
+                    WHERE id = ?;`, queryArray,
+                    function(err, res) {
+                        console.log(`${answer.chooseName} is now assigned ${answer.newManager} as a manager!`)
+                        // console.log(res)
+                        showEmployees()
+                    }
+                )  
+            });
+        }
+    )
+};
+
+// Function #8 - 
+const viewBudgets = () => {
+    inquirer.prompt({
+        type: 'list',
+        name: 'whichDepartment',
+        message: 'Whose department would you like to view budgets?',
+        choices: ['Sales', 'Legal', 'Finance', 'Engineering']
+    }).then((data) => {
+        connection.query(
+            `SELECT SUM(salary)
+            FROM employee e
+            INNER JOIN role r ON e.role_id = r.id
+            INNER JOIN department d ON d.id = r.department_id
+            WHERE d.name = "${data.whichDepartment}";`,
+            function(err, res){
+                let totalBudget = res[0]['SUM(salary)'];
+                console.table(res)
+                console.log(`The total budget is for the ${data.whichDepartment} department is $${totalBudget}.`)
+                console.log("")
+                console.log("")
+                showEmployees()
+            }
+        )}
+    )};
