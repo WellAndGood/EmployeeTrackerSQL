@@ -1,4 +1,4 @@
-# Employee Tracker - Bootcamp Spot - Homework #12
+# Employee Tracker
 ## Author: WellAndGood
 
 # Table of Contents
